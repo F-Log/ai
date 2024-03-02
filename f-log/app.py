@@ -28,8 +28,11 @@ def upload_file():
     file.save(file_path)
 
     # OCR 처리
-    api_url = 'https://ifsdnejq6i.apigw.ntruss.com/custom/v1/28455/49a2e7e233a760ee9e2dbfa797145f0dde1bd7c5826186ae82080d091ff89500/general'
-    secret_key = 'RFZJdkpqT09MVGRuSGl6TmhJc3lnQ2F3Vk51emZ3d1c='
+    api_url = os.getenv('API_URL')
+    secret_key = os.getenv('SECRET_KEY')
+    if not api_url or not secret_key:
+        return jsonify({'error': 'API URL or Secret Key not configured'}), 500
+
     ocr_text = ocr_processor.perform_ocr(api_url, secret_key, file_path)
 
     # 데이터 추출 및 JSON 형식으로 변환, member_uuid 포함
