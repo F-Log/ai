@@ -2,7 +2,7 @@ import json
 import re
 
 
-def extract_nutrition_data(text, diet_id):
+def extract_nutrition_data(text, memberUuid):
     patterns = {
         'calories': r'(\d+(\.\d)?)kcal',
         'carbohydrate': r'탄수화물\s*(\d+(\.\d)?)g',
@@ -13,7 +13,7 @@ def extract_nutrition_data(text, diet_id):
         'cholesterol': r'콜레스테롤\s*(\d+(\.\d)?)mg',
     }
 
-    extracted_data = {'dietId': diet_id}
+    extracted_data = {'memberUuid': memberUuid}
     for key, pattern in patterns.items():
         match = re.search(pattern, text)
         if match:
