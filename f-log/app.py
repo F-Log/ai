@@ -4,11 +4,42 @@ import os
 import ocr_processor
 import data_extractor
 import requests
+import gpt_processor
 
 app = Flask(__name__)
 load_dotenv()
 UPLOAD_FOLDER = 'uploads'
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+
+@app.route('/receive-diet', methods=['POST'])
+def receive_diet():
+    data = request.json  # Extract JSON data sent from Spring DietController
+
+    # Process the received data as needed
+    gender = data.get('gender', 'unknown')
+    height = data.get('height', 'unknown')
+    weight = data.get('bodyWeight', 'unknown')
+    muscle_mass = data.get('muscleMass', 'unknown')
+    fat_mass = data.get('fatMass', 'unknown')
+    exercise_goal = data.get('exerciseGoal', 'unknown')
+    total_protein = data.get('totalProtein', 'unknown')
+    total_carbohydrates = data.get('totalCarbohydrate', 'unknown')
+    total_fat = data.get('totalFat', 'unknown')
+    total_sodium = data.get('totalSodium', 'unknown')
+
+    # Prepare the message content
+    message_content = f"""
+    gender: {gender}, height: {height}, weight: {weight}, muscle mass: {muscle_mass}, fat mass: {fat_mass}, exercise goal: {exercise_goal},
+    total protein: {total_protein}, total carbohydrates: {total_carbohydrates}, total fat: {total_fat}, total sodium: {total_sodium}
+    """
+
+    print(message_content)
+
+    # Call the function from gpt_processor.py to get the completion
+    completion = gpt_processor.get_completion(message_content)
+
+    print(completion)
+    return completion, 200
 
 @app.route('/upload', methods=['POST'])
 def upload_file():
@@ -43,7 +74,6 @@ def upload_file():
 
     # 임시 파일 삭제
     os.remove(file_path)
-
     return response.text
 
 def send_data_to_spring_boot(json_data):
