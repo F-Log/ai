@@ -16,6 +16,7 @@ def receive_diet():
     data = request.json  # Extract JSON data sent from Spring DietController
 
     # Process the received data as needed
+    diet_uuid = data.get('dietUuid', 'unknown')
     gender = data.get('gender', 'unknown')
     height = data.get('height', 'unknown')
     weight = data.get('bodyWeight', 'unknown')
@@ -33,13 +34,26 @@ def receive_diet():
     total protein: {total_protein}, total carbohydrates: {total_carbohydrates}, total fat: {total_fat}, total sodium: {total_sodium}
     """
 
-    print(message_content)
+    print(message_content)  # logging
 
     # Call the function from gpt_processor.py to get the completion
     completion = gpt_processor.get_completion(message_content)
 
-    print(completion)
-    return completion, 200
+    print(completion)   # logging
+
+    # Prepare JSON payload for Spring Boot server including completion
+    json_payload = {
+        "dietUuid": diet_uuid,
+        "dietFeedback": completion
+    }
+
+    print(json_payload)
+
+    # Send data to Spring Boot server
+    response = send_dietfeedback_to_spring_boot(json_payload)
+
+    # Return response from Spring Boot server
+    return jsonify(response.json()), response.status_code
 
 @app.route('/upload', methods=['POST'])
 def upload_file():
@@ -80,6 +94,12 @@ def send_data_to_spring_boot(json_data):
     url = "http://localhost:8080/api/v1/food/new"
     headers = {"Content-Type": "application/json"}
     response = requests.post(url, headers=headers, data=json_data)
+    return response
+
+def send_dietfeedback_to_spring_boot(json_data):
+    url = "http://localhost:8080/api/v1/diet-feedback/new"
+    headers = {"Content-Type": "application/json"}
+    response = requests.post(url, headers=headers, json=json_data)
     return response
 
 if __name__ == '__main__':
