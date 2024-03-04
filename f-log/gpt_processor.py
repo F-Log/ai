@@ -14,8 +14,8 @@ def get_completion(message_content):
                 "role": "system",
                 "content": f"""
                 You are a professional physical health analyzer.
-                I will give you informations of my body, my exercise goal, and today's total food nutrition informations.
-                You must give appropriate feedback on my today's diet.
+                I will give you informations of my body, my exercise goal, and total food nutrition intake information.
+                You must give appropriate feedback on the given diet.
                 """
             },
             {
