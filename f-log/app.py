@@ -34,12 +34,8 @@ def receive_diet():
     total protein: {total_protein}, total carbohydrates: {total_carbohydrates}, total fat: {total_fat}, total sodium: {total_sodium}
     """
 
-    print(message_content)  # logging
-
     # Call the function from gpt_processor.py to get the completion
     completion = gpt_processor.get_completion(message_content)
-
-    print(completion)   # logging
 
     # Prepare JSON payload for Spring Boot server including completion
     json_payload = {
