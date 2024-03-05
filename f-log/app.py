@@ -11,9 +11,42 @@ load_dotenv()
 UPLOAD_FOLDER = 'uploads'
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
+@app.route('/receive-inbody', methods=['POST'])
+def receive_inbody():
+    data = request.get_json()   # Extract JSON data sent from Spring GptController
+
+    inbody_uuid = data.get('inbodyUuid', 'unknown')
+    height = data.get('height', 'unknown')
+    weight = data.get('bodyWeight', 'unknown')
+    muscle_mass = data.get('muscleMass', 'unknown')
+    fat_mass = data.get('fatMass', 'unknown')
+    exercise_goal = data.get('exerciseGoal', 'unknown')
+    gender = data.get('gender', 'unknown')
+
+    message_content = f"""
+    height: {height}, weight: {weight}, muscle mass: {muscle_mass}, 
+    fat mass: {fat_mass}, exercise goal: {exercise_goal}, gender: {gender}
+    """
+
+    # Call the function from gpt_processor.py to get the completion
+    completion = gpt_processor.get_inbody_completion(message_content)
+
+    # Prepare JSON payload for Spring Boot server including completion
+    json_payload = {
+        "inbodyUuid": inbody_uuid,
+        "inbodyFeedback": completion
+    }
+
+    # Send data to Spring Boot server
+    response = send_inbodyfeedback_to_spring_boot(json_payload)
+
+    # Return response from Spring Boot server
+    return jsonify(response.json()), response.status_code
+
+
 @app.route('/receive-diet', methods=['POST'])
 def receive_diet():
-    data = request.json  # Extract JSON data sent from Spring DietController
+    data = request.json  # Extract JSON data sent from Spring GptController
 
     # Process the received data as needed
     diet_uuid = data.get('dietUuid', 'unknown')
@@ -35,15 +68,13 @@ def receive_diet():
     """
 
     # Call the function from gpt_processor.py to get the completion
-    completion = gpt_processor.get_completion(message_content)
+    completion = gpt_processor.get_diet_completion(message_content)
 
     # Prepare JSON payload for Spring Boot server including completion
     json_payload = {
         "dietUuid": diet_uuid,
         "dietFeedback": completion
     }
-
-    print(json_payload)
 
     # Send data to Spring Boot server
     response = send_dietfeedback_to_spring_boot(json_payload)
@@ -94,6 +125,12 @@ def send_data_to_spring_boot(json_data):
 
 def send_dietfeedback_to_spring_boot(json_data):
     url = "http://localhost:8080/api/v1/diet-feedback/new"
+    headers = {"Content-Type": "application/json"}
+    response = requests.post(url, headers=headers, json=json_data)
+    return response
+
+def send_inbodyfeedback_to_spring_boot(json_data):
+    url = "http://localhost:8080/api/v1/inbody-feedback/new"
     headers = {"Content-Type": "application/json"}
     response = requests.post(url, headers=headers, json=json_data)
     return response
