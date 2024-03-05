@@ -20,7 +20,7 @@ def receive_inbody():
     weight = data.get('bodyWeight', 'unknown')
     muscle_mass = data.get('muscleMass', 'unknown')
     fat_mass = data.get('fatMass', 'unknown')
-    exercise_goal = data.get('exerciseGoal', 'unknown')
+    exercise_goal = data.get('exerciseGoal', 'unknown')     # TODO: implement exercise from Spring
     gender = data.get('gender', 'unknown')
 
     message_content = f"""
@@ -60,11 +60,14 @@ def receive_diet():
     total_carbohydrates = data.get('totalCarbohydrate', 'unknown')
     total_fat = data.get('totalFat', 'unknown')
     total_sodium = data.get('totalSodium', 'unknown')
+    total_sugar = data.get('totalSugar', 'unknown')
+    total_calories = data.get('totalCalories', 'unknown')
 
     # Prepare the message content
     message_content = f"""
     gender: {gender}, height: {height}, weight: {weight}, muscle mass: {muscle_mass}, fat mass: {fat_mass}, exercise goal: {exercise_goal},
-    total protein: {total_protein}, total carbohydrates: {total_carbohydrates}, total fat: {total_fat}, total sodium: {total_sodium}
+    total protein: {total_protein}, total carbohydrates: {total_carbohydrates}, total fat: {total_fat}, total sodium: {total_sodium},
+    total sugar: {total_sugar}, total calories: {total_calories}
     """
 
     # Call the function from gpt_processor.py to get the completion
