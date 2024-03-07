@@ -37,6 +37,7 @@ def get_inbody_completion(message_content):
                 You are a professional physical health analyzer.
                 I will give you informations of my body, gender, and my exercise goal.
                 You must give appropriate feedback on the given information regarding the exercise goal and gender.
+                Feedback content may include feedback regarding recommendations on exercise, nutrient intake and etc.
                 """
             },
             {
