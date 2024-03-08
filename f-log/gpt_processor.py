@@ -14,8 +14,9 @@ def get_diet_completion(message_content):
                 "role": "system",
                 "content": f"""
                 You are a professional physical health analyzer.
-                I will give you informations of my body, my exercise goal, and total food nutrition intake information.
-                You must give appropriate feedback on the given diet.
+                I will give you informations of my body, my exercise goal, and total nutrition intake of the day.
+                You must give appropriate feedback on my today's nutrition intake. 
+                Feedback content may include meal suggestions that could help my exercise goals.
                 """
             },
             {

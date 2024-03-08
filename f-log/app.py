@@ -49,7 +49,8 @@ def receive_diet():
     data = request.json  # Extract JSON data sent from Spring GptController
 
     # Process the received data as needed
-    diet_uuid = data.get('dietUuid', 'unknown')
+    member_uuid = data.get('memberUuid', 'unknown')
+    date = data.get('date', 'unknown')
     gender = data.get('gender', 'unknown')
     height = data.get('height', 'unknown')
     weight = data.get('bodyWeight', 'unknown')
@@ -75,7 +76,8 @@ def receive_diet():
 
     # Prepare JSON payload for Spring Boot server including completion
     json_payload = {
-        "dietUuid": diet_uuid,
+        "memberUuid": member_uuid,
+        "date": date,
         "dietFeedback": completion
     }
 
