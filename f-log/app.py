@@ -20,12 +20,12 @@ def receive_inbody():
     weight = data.get('bodyWeight', 'unknown')
     muscle_mass = data.get('muscleMass', 'unknown')
     fat_mass = data.get('fatMass', 'unknown')
-    exercise_goal = data.get('exerciseGoal', 'unknown')     # TODO: implement exercise from Spring
+    exercise_purpose = data.get('exercisePurpose', 'unknown')
     gender = data.get('gender', 'unknown')
 
     message_content = f"""
     height: {height}, weight: {weight}, muscle mass: {muscle_mass}, 
-    fat mass: {fat_mass}, exercise goal: {exercise_goal}, gender: {gender}
+    fat mass: {fat_mass}, exercise goal: {exercise_purpose}, gender: {gender}
     """
 
     # Call the function from gpt_processor.py to get the completion
@@ -49,25 +49,26 @@ def receive_diet():
     data = request.json  # Extract JSON data sent from Spring GptController
 
     # Process the received data as needed
-    diet_uuid = data.get('dietUuid', 'unknown')
+    member_uuid = data.get('memberUuid', 'unknown')
+    date = data.get('date', 'unknown')
     gender = data.get('gender', 'unknown')
     height = data.get('height', 'unknown')
     weight = data.get('bodyWeight', 'unknown')
     muscle_mass = data.get('muscleMass', 'unknown')
     fat_mass = data.get('fatMass', 'unknown')
-    exercise_goal = data.get('exerciseGoal', 'unknown')
+    exercise_purpose = data.get('exercisePurpose', 'unknown')
     total_protein = data.get('totalProtein', 'unknown')
     total_carbohydrates = data.get('totalCarbohydrate', 'unknown')
     total_fat = data.get('totalFat', 'unknown')
     total_sodium = data.get('totalSodium', 'unknown')
-    total_sugar = data.get('totalSugar', 'unknown')
+    total_sugars = data.get('totalSugars', 'unknown')
     total_calories = data.get('totalCalories', 'unknown')
 
     # Prepare the message content
     message_content = f"""
-    gender: {gender}, height: {height}, weight: {weight}, muscle mass: {muscle_mass}, fat mass: {fat_mass}, exercise goal: {exercise_goal},
-    total protein: {total_protein}, total carbohydrates: {total_carbohydrates}, total fat: {total_fat}, total sodium: {total_sodium},
-    total sugar: {total_sugar}, total calories: {total_calories}
+    gender: {gender}, height: {height}, weight: {weight}, muscle mass: {muscle_mass}, fat mass: {fat_mass}, 
+    exercise goal: {exercise_purpose}, total protein: {total_protein}, total carbohydrates: {total_carbohydrates}, 
+    total fat: {total_fat}, total sodium: {total_sodium}, total sugars: {total_sugars}, total calories: {total_calories}
     """
 
     # Call the function from gpt_processor.py to get the completion
@@ -75,7 +76,8 @@ def receive_diet():
 
     # Prepare JSON payload for Spring Boot server including completion
     json_payload = {
-        "dietUuid": diet_uuid,
+        "memberUuid": member_uuid,
+        "date": date,
         "dietFeedback": completion
     }
 
