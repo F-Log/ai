@@ -22,11 +22,15 @@ def receive_inbody():
     fat_mass = data.get('fatMass', 'unknown')
     exercise_purpose = data.get('exercisePurpose', 'unknown')
     gender = data.get('gender', 'unknown')
+    health_information = data.get('healthInformation', 'unknown')
 
     message_content = f"""
     height: {height}, weight: {weight}, muscle mass: {muscle_mass}, 
-    fat mass: {fat_mass}, exercise goal: {exercise_purpose}, gender: {gender}
+    fat mass: {fat_mass}, exercise goal: {exercise_purpose}, gender: {gender},
+    usual activity: {health_information}
     """
+
+    print(message_content)  # logging
 
     # Call the function from gpt_processor.py to get the completion
     completion = gpt_processor.get_inbody_completion(message_content)
@@ -36,6 +40,8 @@ def receive_inbody():
         "inbodyUuid": inbody_uuid,
         "inbodyFeedback": completion
     }
+
+    print(json_payload) # logging
 
     # Send data to Spring Boot server
     response = send_inbodyfeedback_to_spring_boot(json_payload)
