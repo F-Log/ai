@@ -1,3 +1,5 @@
+import json
+
 from dotenv import load_dotenv
 from flask import Flask, request, jsonify
 import os
@@ -87,6 +89,35 @@ def receive_diet():
     # Return response from Spring Boot server
     return jsonify(response.json()), response.status_code
 
+@app.route('/save-inbody', methods=['POST'])
+def save_inbody_ocr():
+    memberUuid = request.form.get('memberUuid', None)
+    if not memberUuid:
+        return jsonify({'error': 'No memberUuid provided'}), 400
+
+    if 'file' not in request.files:
+        return jsonify({'error': 'No file part'}), 400
+    file = request.files['file']
+    if file.filename == '':
+        return jsonify({'error': 'No selected file'}), 400
+
+    file_path = os.path.join(app.config['UPLOAD_FOLDER'], file.filename)
+    file.save(file_path)
+
+    api_url = os.getenv('API_URL')
+    secret_key = os.getenv('SECRET_KEY')
+    if not api_url or not secret_key:
+        return jsonify({'error': 'API URL or Secret Key not configured'}), 500
+
+    ocr_text = ocr_processor.perform_ocr(api_url, secret_key, file_path)
+    memberUuid = request.form.get('memberUuid')
+    json_data = data_extractor.extract_inbody_data(ocr_text, memberUuid)
+    response = send_inbodydata_to_spring_boot(json_data)
+
+    os.remove(file_path)
+    return response.text
+
+
 @app.route('/upload', methods=['POST'])
 def upload_file():
     # memberUuid form-data에서 추출
@@ -116,13 +147,19 @@ def upload_file():
     json_data = data_extractor.extract_nutrition_data(ocr_text, memberUuid)
 
     # Spring Boot 애플리케이션으로 데이터 전송
-    response = send_data_to_spring_boot(json_data)
+    response = send_fooddata_to_spring_boot(json_data)
 
     # 임시 파일 삭제
     os.remove(file_path)
     return response.text
 
-def send_data_to_spring_boot(json_data):
+def send_inbodydata_to_spring_boot(json_data):
+    url = "http://localhost:8080/api/v1/inbody/new"
+    headers = {"Content-Type": "application/json"}
+    response = requests.post(url, headers=headers, data=json_data)
+    return response
+
+def send_fooddata_to_spring_boot(json_data):
     url = "http://localhost:8080/api/v1/food/new"
     headers = {"Content-Type": "application/json"}
     response = requests.post(url, headers=headers, data=json_data)
