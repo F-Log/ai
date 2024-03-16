@@ -24,11 +24,15 @@ def receive_inbody():
     fat_mass = data.get('fatMass', 'unknown')
     exercise_purpose = data.get('exercisePurpose', 'unknown')
     gender = data.get('gender', 'unknown')
+    health_information = data.get('healthInformation', 'unknown')
 
     message_content = f"""
     height: {height}, weight: {weight}, muscle mass: {muscle_mass}, 
-    fat mass: {fat_mass}, exercise goal: {exercise_purpose}, gender: {gender}
+    fat mass: {fat_mass}, exercise goal: {exercise_purpose}, gender: {gender},
+    usual activity: {health_information}
     """
+
+    print(message_content)  # logging
 
     # Call the function from gpt_processor.py to get the completion
     completion = gpt_processor.get_inbody_completion(message_content)
@@ -36,8 +40,10 @@ def receive_inbody():
     # Prepare JSON payload for Spring Boot server including completion
     json_payload = {
         "inbodyUuid": inbody_uuid,
-        "inbodyFeedback": completion
+        "content": completion
     }
+
+    print(json_payload) # logging
 
     # Send data to Spring Boot server
     response = send_inbodyfeedback_to_spring_boot(json_payload)
@@ -45,9 +51,50 @@ def receive_inbody():
     # Return response from Spring Boot server
     return jsonify(response.json()), response.status_code
 
-
+# 특정 식단에 대한 피드백
 @app.route('/receive-diet', methods=['POST'])
 def receive_diet():
+    data = request.get_json()  # Extract JSON data sent from Spring GptController
+
+    # Process the received data as needed
+    diet_uuid = data.get('dietUuid', 'unknown')
+    member_uuid = data.get('memberUuid', 'unknown')
+    total_carbohydrates = data.get('totalCarbohydrate', 'unknown')
+    total_protein = data.get('totalProtein', 'unknown')
+    total_fat = data.get('totalFat', 'unknown')
+    total_sodium = data.get('totalSodium', 'unknown')
+    total_sugars = data.get('totalSugars', 'unknown')
+    total_calories = data.get('totalCalories', 'unknown')
+    meal_type = data.get('mealType', 'unknown')
+    meal_date = data.get('mealDate', 'unknown')
+    allergies = data.get('allergies', [])
+    food_names = data.get('foodNames', [])
+
+    # Prepare the message content
+    message_content = f"""
+    For the diet on {meal_date} which consists of {', '.join(food_names)}, considering the member's allergies: {', '.join(allergies)},
+    the total nutritional intake is: proteins {total_protein}g, carbohydrates {total_carbohydrates}g, fats {total_fat}g, sodium {total_sodium}mg, 
+    sugars {total_sugars}g, and total calories {total_calories}. The meal type is {meal_type}.
+    """
+
+    # Call the function from gpt_processor.py to get the completion
+    completion = gpt_processor.get_diet_completion(message_content)
+
+    # Prepare JSON payload for Spring Boot server including completion
+    json_payload = {
+        "dietUuid": diet_uuid,
+        "content": completion
+    }
+
+    # Send data to Spring Boot server
+    response = send_dietfeedback_to_spring_boot(json_payload)
+
+    # Return response from Spring Boot server
+    return jsonify(response.json()), response.status_code
+
+# 하루 총 영양섭취 피드백
+@app.route('/receive-daily-diet', methods=['POST'])
+def receive_daily_diet():
     data = request.json  # Extract JSON data sent from Spring GptController
 
     # Process the received data as needed
@@ -73,18 +120,22 @@ def receive_diet():
     total fat: {total_fat}, total sodium: {total_sodium}, total sugars: {total_sugars}, total calories: {total_calories}
     """
 
+    print(message_content)  # logging
+
     # Call the function from gpt_processor.py to get the completion
-    completion = gpt_processor.get_diet_completion(message_content)
+    completion = gpt_processor.get_daily_diet_completion(message_content)
 
     # Prepare JSON payload for Spring Boot server including completion
     json_payload = {
         "memberUuid": member_uuid,
         "date": date,
-        "dietFeedback": completion
+        "content": completion
     }
 
+    print(json_payload)     # logging
+
     # Send data to Spring Boot server
-    response = send_dietfeedback_to_spring_boot(json_payload)
+    response = send_daily_dietfeedback_to_spring_boot(json_payload)
 
     # Return response from Spring Boot server
     return jsonify(response.json()), response.status_code
@@ -165,14 +216,20 @@ def send_fooddata_to_spring_boot(json_data):
     response = requests.post(url, headers=headers, data=json_data)
     return response
 
-def send_dietfeedback_to_spring_boot(json_data):
-    url = "http://localhost:8080/api/v1/diet-feedback/new"
+def send_daily_dietfeedback_to_spring_boot(json_data):
+    url = "http://localhost:8080/api/v1/daily-diet-feedback/new"
     headers = {"Content-Type": "application/json"}
     response = requests.post(url, headers=headers, json=json_data)
     return response
 
 def send_inbodyfeedback_to_spring_boot(json_data):
     url = "http://localhost:8080/api/v1/inbody-feedback/new"
+    headers = {"Content-Type": "application/json"}
+    response = requests.post(url, headers=headers, json=json_data)
+    return response
+
+def send_dietfeedback_to_spring_boot(json_data):
+    url = "http://localhost:8080/api/v1/diet-feedback/new"
     headers = {"Content-Type": "application/json"}
     response = requests.post(url, headers=headers, json=json_data)
     return response
