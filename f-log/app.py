@@ -7,11 +7,15 @@ import ocr_processor
 import data_extractor
 import requests
 import gpt_processor
+from flask_cors import CORS
 
 app = Flask(__name__)
 load_dotenv()
 UPLOAD_FOLDER = 'uploads'
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+
+# Enable CORS
+CORS(app, resources={r"/*": {"origins": "http://localhost:3000"}})
 
 @app.route('/receive-inbody', methods=['POST'])
 def receive_inbody():
@@ -32,8 +36,6 @@ def receive_inbody():
     usual activity: {health_information}
     """
 
-    print(message_content)  # logging
-
     # Call the function from gpt_processor.py to get the completion
     completion = gpt_processor.get_inbody_completion(message_content)
 
@@ -42,8 +44,6 @@ def receive_inbody():
         "inbodyUuid": inbody_uuid,
         "content": completion
     }
-
-    print(json_payload) # logging
 
     # Send data to Spring Boot server
     response = send_inbodyfeedback_to_spring_boot(json_payload)
@@ -164,6 +164,9 @@ def save_inbody_ocr():
     memberUuid = request.form.get('memberUuid')
     json_data = data_extractor.extract_inbody_data(ocr_text, memberUuid)
     response = send_inbodydata_to_spring_boot(json_data)
+
+    print(ocr_text)     # logging
+    print(memberUuid)   # logging
 
     os.remove(file_path)
     return response.text
