@@ -36,8 +36,6 @@ def receive_inbody():
     usual activity: {health_information}
     """
 
-    print(message_content)  # logging
-
     # Call the function from gpt_processor.py to get the completion
     completion = gpt_processor.get_inbody_completion(message_content)
 
@@ -46,8 +44,6 @@ def receive_inbody():
         "inbodyUuid": inbody_uuid,
         "content": completion
     }
-
-    print(json_payload) # logging
 
     # Send data to Spring Boot server
     response = send_inbodyfeedback_to_spring_boot(json_payload)
