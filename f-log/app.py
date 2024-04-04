@@ -208,31 +208,31 @@ def upload_file():
     return response.text
 
 def send_inbodydata_to_spring_boot(json_data):
-    url = "http://localhost:8080/api/v1/inbody/new"
+    url = "http://backend:8080/api/v1/inbody/new"
     headers = {"Content-Type": "application/json"}
     response = requests.post(url, headers=headers, data=json_data)
     return response
 
 def send_fooddata_to_spring_boot(json_data):
-    url = "http://localhost:8080/api/v1/food/new"
+    url = "http://backend:8080/api/v1/food/new"
     headers = {"Content-Type": "application/json"}
     response = requests.post(url, headers=headers, data=json_data)
     return response
 
 def send_daily_dietfeedback_to_spring_boot(json_data):
-    url = "http://localhost:8080/api/v1/daily-diet-feedback/new"
+    url = "http://backend:8080/api/v1/daily-diet-feedback/new"
     headers = {"Content-Type": "application/json"}
     response = requests.post(url, headers=headers, json=json_data)
     return response
 
 def send_inbodyfeedback_to_spring_boot(json_data):
-    url = "http://localhost:8080/api/v1/inbody-feedback/new"
+    url = "http://backend:8080/api/v1/inbody-feedback/new"
     headers = {"Content-Type": "application/json"}
     response = requests.post(url, headers=headers, json=json_data)
     return response
 
 def send_dietfeedback_to_spring_boot(json_data):
-    url = "http://localhost:8080/api/v1/diet-feedback/new"
+    url = "http://backend:8080/api/v1/diet-feedback/new"
     headers = {"Content-Type": "application/json"}
     response = requests.post(url, headers=headers, json=json_data)
     return response
